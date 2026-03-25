@@ -4,7 +4,6 @@
 require('dotenv').config();
 
 const express   = require('express');
-const cors      = require('cors');
 const helmet    = require('helmet');
 const morgan    = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -29,32 +28,22 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json({ limit: '16kb' }));
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
 
-app.use(cors({
-  origin: (origin, cb) => {
-    // Allow requests with no origin (Postman, curl)
-    if (!origin) return cb(null, true);
-    // Allow anything in the allowed origins list
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    // Allow all localhost ports in development
-    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      return cb(null, true);
-    }
-    // Allow GitHub Pages domain always
-    if (origin.startsWith('https://ashleycodinggeek.github.io')) {
-      return cb(null, true);
-    }
-    cb(new Error('Not allowed by CORS'));
-  },
-  origin: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-  credentials: false,
-}));
+// Handle OPTIONS preflight for all routes
+app.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendStatus(204);
+});
 
-// Handle OPTIONS preflight requests explicitly
-app.options('*', cors());
+// Set CORS headers on every response
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 app.use('/api/', rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
