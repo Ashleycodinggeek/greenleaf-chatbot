@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lea — GreenLeaf Customer Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --forest:    #1a3a2a;
+  --leaf:      #2d6a4f;
+  --mint:      #52b788;
+  --sage:      #95d5b2;
+  --pale:      #d8f3dc;
+  --cream:     #f8f6f0;
+  --parchment: #ede8de;
+  --bark:      #6b5e4e;
+  --charcoal:  #2a2a2a;
+  --mist:      #a0b4a8;
+  --white:     #ffffff;
+  --danger:    #c0392b;
+  --warning:   #e67e22;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(82,183,136,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(45,106,79,0.06) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  background: var(--forest);
+  padding: 0 28px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 3px solid var(--mint); flex-shrink: 0;
+}
+.logo { display: flex; align-items: center; gap: 11px; }
+.logo-mark {
+  width: 34px; height: 34px; background: linear-gradient(135deg, var(--mint), var(--sage));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; box-shadow: 0 2px 8px rgba(82,183,136,0.4);
+}
+.logo-text { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.05rem; font-weight: 600; }
+.logo-sub  { font-size: 0.62rem; color: var(--sage); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 300; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.03em; }
+.pill-conn { background: rgba(82,183,136,0.15); color: var(--sage); border: 1px solid rgba(82,183,136,0.3); display: flex; align-items: center; gap: 5px; }
+.pill-conn.off { background: rgba(192,57,43,0.15); color: #e88080; border-color: rgba(192,57,43,0.3); }
+.cdot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); }
+.cdot.live { animation: blink 2s ease infinite; }
+.pill-conn.off .cdot { background: #e88080; }
+.pill-model { background: rgba(255,255,255,0.08); color: #aac7b4; border: 1px solid rgba(255,255,255,0.1); }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid; grid-template-columns: 240px 1fr 290px;
+  flex: 1; overflow: hidden; position: relative; z-index: 1;
+}
+
+/* ── LEFT SIDEBAR ── */
+.sl {
+  background: var(--forest); color: #b8d4c2;
+  display: flex; flex-direction: column; gap: 20px;
+  padding: 18px 14px; overflow-y: auto;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.sl::-webkit-scrollbar { width: 3px; }
+.sl::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+.slabel { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 7px; }
+.faq-list { display: flex; flex-direction: column; gap: 5px; }
+.fchip {
+  padding: 9px 11px; border-radius: 8px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+  font-size: 0.77rem; color: #c8ddd2; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 8px; line-height: 1.3;
+}
+.fchip:hover { background: rgba(82,183,136,0.12); border-color: rgba(82,183,136,0.3); color: var(--sage); }
+.fchip-i { font-size: 0.88rem; flex-shrink: 0; }
+.icard { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 11px; }
+.irow { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.73rem; }
+.irow:last-child { border-bottom: none; }
+.irow-icon { font-size: 0.82rem; flex-shrink: 0; margin-top: 1px; }
+.irow-lbl { color: rgba(255,255,255,0.3); font-size: 0.63rem; display: block; margin-bottom: 1px; }
+.irow-val { color: #c8ddd2; line-height: 1.4; }
+.sbar { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 11px; }
+.srow { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.71rem; color: rgba(255,255,255,0.3); }
+.srow span:last-child { color: #b8d4c2; }
+.astack { display: flex; flex-direction: column; gap: 0; }
+.arow { display: flex; align-items: center; gap: 9px; padding: 6px 9px; border-radius: 6px; font-size: 0.73rem; position: relative; }
+.arow::before { content: ''; position: absolute; left: 22px; top: -5px; width: 1px; height: 5px; background: rgba(82,183,136,0.2); }
+.arow:first-child::before { display: none; }
+.aicon { width: 25px; height: 25px; border-radius: 6px; background: rgba(82,183,136,0.1); border: 1px solid rgba(82,183,136,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; }
+.aname { font-weight: 500; color: #d4e8dc; font-size: 0.74rem; }
+.atech { font-size: 0.63rem; color: rgba(255,255,255,0.28); }
+
+/* ── CHAT ── */
+.chat { display: flex; flex-direction: column; background: var(--white); overflow: hidden; }
+.chat-top {
+  padding: 13px 22px; border-bottom: 1px solid var(--parchment);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  background: linear-gradient(to bottom, #fdfdfd, var(--white));
+}
+.bot-id { display: flex; align-items: center; gap: 11px; }
+.bot-av {
+  width: 41px; height: 41px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--leaf), var(--mint));
+  display: flex; align-items: center; justify-content: center; font-size: 19px;
+  box-shadow: 0 2px 10px rgba(45,106,79,0.25); flex-shrink: 0;
+}
+.bot-name { font-family: 'Playfair Display', serif; font-size: 0.97rem; font-weight: 600; color: var(--forest); }
+.bot-role { font-size: 0.7rem; color: var(--mist); display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.odot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); animation: blink 2s ease infinite; }
+.chat-btns { display: flex; gap: 7px; }
+.cbtn { padding: 5px 12px; border-radius: 8px; border: 1px solid var(--parchment); background: var(--cream); font-family: 'Outfit', sans-serif; font-size: 0.73rem; font-weight: 500; color: var(--bark); cursor: pointer; transition: all 0.15s; }
+.cbtn:hover { background: var(--parchment); }
+.cbtn.red { color: var(--danger); background: #fdf4f3; border-color: #f0c4c0; }
+.cbtn.red:hover { background: #fce8e6; }
+
+.msgs {
+  flex: 1; overflow-y: auto; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth;
+}
+.msgs::-webkit-scrollbar { width: 4px; }
+.msgs::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 4px; }
+
+.msg { display: flex; gap: 10px; animation: msgIn 0.24s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes msgIn { from{opacity:0;transform:translateY(9px) scale(0.97)} to{opacity:1;transform:none} }
+.msg.user { flex-direction: row-reverse; }
+.mav { width: 31px; height: 31px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; margin-top: 4px; }
+.msg.bot  .mav { background: linear-gradient(135deg, var(--leaf), var(--mint)); color: #fff; }
+.msg.user .mav { background: var(--forest); color: #fff; }
+.mbody { max-width: 71%; }
+.bubble { padding: 11px 15px; border-radius: 14px; font-size: 0.875rem; line-height: 1.65; word-break: break-word; }
+.msg.bot  .bubble { background: var(--pale); color: var(--charcoal); border-bottom-left-radius: 4px; border: 1px solid rgba(149,213,178,0.3); }
+.msg.user .bubble { background: var(--forest); color: #e8f5ee; border-bottom-right-radius: 4px; }
+.mmeta { font-size: 0.65rem; color: var(--mist); margin-top: 4px; padding: 0 3px; }
+.msg.user .mmeta { text-align: right; }
+.mtags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+.tag { padding: 2px 7px; border-radius: 9px; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.02em; }
+.t-faq     {background:#e8f4fd;color:#1a6fa0} .t-order  {background:#edf7ee;color:#1e7e34}
+.t-returns {background:#fef6e8;color:#a0660a} .t-product{background:#f0ebfa;color:#6c3aad}
+.t-hours   {background:#e8f8f5;color:#0e6655} .t-payment{background:#fdeef2;color:#a0184a}
+.t-loyalty {background:#fff8e1;color:#9a7400} .t-escalate{background:#fdf0ee;color:#c0392b}
+.t-resolved{background:#edf7ee;color:#1e7e34} .t-time   {background:#f4f4f4;color:#888}
+
+.esc-card {
+  margin-top: 8px; padding: 11px 14px; border-radius: 8px;
+  background: #fffaf0; border: 1px solid #f0c060;
+  display: flex; gap: 9px; align-items: flex-start; font-size: 0.79rem;
+}
+.esc-icon { font-size: 1.05rem; flex-shrink: 0; }
+.esc-body b { display: block; color: #a05800; margin-bottom: 2px; font-size: 0.8rem; }
+.esc-body span { color: #7a6040; }
+
+.typing-wrap { display: flex; gap: 10px; animation: msgIn 0.2s ease; }
+.typing-bub {
+  display: flex; gap: 5px; align-items: center;
+  padding: 12px 17px; background: var(--pale); border-radius: 14px;
+  border-bottom-left-radius: 4px; border: 1px solid rgba(149,213,178,0.3);
+}
+.tdot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); animation: td 1.3s ease infinite; }
+.tdot:nth-child(2){animation-delay:.2s} .tdot:nth-child(3){animation-delay:.4s}
+@keyframes td{0%,60%,100%{transform:none;opacity:0.35}30%{transform:translateY(-6px);opacity:1}}
+
+.chat-bot { padding: 13px 22px; border-top: 1px solid var(--parchment); background: #fdfcfa; flex-shrink: 0; }
+.qchips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.qchip { padding: 5px 11px; border-radius: 18px; border: 1px solid var(--parchment); background: var(--cream); font-family: 'Outfit', sans-serif; font-size: 0.73rem; color: var(--bark); cursor: pointer; transition: all 0.15s; }
+.qchip:hover { background: var(--forest); color: var(--sage); border-color: var(--forest); }
+.input-wrap { display: flex; gap: 9px; align-items: flex-end; }
+.minput {
+  flex: 1; border: 1.5px solid var(--parchment); border-radius: 13px;
+  padding: 11px 15px; font-family: 'Outfit', sans-serif; font-size: 0.875rem;
+  resize: none; outline: none; line-height: 1.5; max-height: 110px;
+  background: var(--cream); color: var(--charcoal); transition: border-color 0.2s;
+}
+.minput:focus { border-color: var(--mint); background: var(--white); }
+.minput::placeholder { color: var(--mist); }
+.sbtn {
+  width: 43px; height: 43px; border-radius: 8px; background: var(--leaf);
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #fff; transition: all 0.15s; flex-shrink: 0; box-shadow: 0 2px 8px rgba(45,106,79,0.3);
+}
+.sbtn:hover:not(:disabled) { background: var(--forest); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,58,42,0.35); }
+.sbtn:disabled { background: var(--parchment); box-shadow: none; cursor: not-allowed; color: var(--mist); }
+.sbtn svg { width: 17px; height: 17px; }
+
+/* ── RIGHT SIDEBAR ── */
+.sr {
+  background: var(--cream); border-left: 1px solid var(--parchment);
+  overflow-y: auto; padding: 17px 14px; display: flex; flex-direction: column; gap: 19px;
+}
+.sr::-webkit-scrollbar { width: 3px; }
+.sr::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 3px; }
+.phead { font-family: 'Playfair Display', serif; font-size: 0.87rem; font-weight: 600; color: var(--forest); margin-bottom: 11px; }
+.kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.kcard { background: var(--white); border: 1px solid var(--parchment); border-radius: 8px; padding: 11px 9px; text-align: center; transition: box-shadow 0.2s; }
+.kcard:hover { box-shadow: 0 2px 8px rgba(26,58,42,0.08); }
+.kval { font-family: 'Playfair Display', serif; font-size: 1.42rem; font-weight: 700; color: var(--leaf); line-height: 1; }
+.kval.teal   { color: #0e7490; }
+.kval.amber  { color: var(--warning); }
+.klbl { font-size: 0.63rem; color: var(--mist); margin-top: 4px; line-height: 1.3; font-weight: 500; letter-spacing: 0.02em; }
+.ibars { display: flex; flex-direction: column; gap: 10px; }
+.ibar-hdr { display: flex; justify-content: space-between; font-size: 0.73rem; color: var(--bark); margin-bottom: 4px; font-weight: 500; }
+.ibar-pct { color: var(--mist); font-size: 0.69rem; }
+.btrack { height: 5px; background: var(--parchment); border-radius: 3px; overflow: hidden; }
+.bfill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.34,1.2,0.64,1); }
+.bf-faq    {background:#2980b9} .bf-order  {background:var(--leaf)} .bf-returns{background:var(--warning)}
+.bf-prod   {background:#8e44ad} .bf-hours  {background:#16a085}     .bf-pay    {background:#c0392b}
+.bf-loyal  {background:#f39c12} .bf-esc    {background:#e74c3c}
+.lfeed { display: flex; flex-direction: column; gap: 5px; max-height: 175px; overflow-y: auto; }
+.lfeed::-webkit-scrollbar { width: 2px; }
+.lfeed::-webkit-scrollbar-thumb { background: var(--parchment); }
+.lentry { display: flex; justify-content: space-between; align-items: center; padding: 6px 9px; border-radius: 6px; font-size: 0.7rem; font-weight: 500; }
+.le-faq    {background:#e8f4fd;color:#1a5f8a} .le-order  {background:#edf7ee;color:#1a6028}
+.le-returns{background:#fef6e8;color:#8a5200} .le-product{background:#f3eefa;color:#5a2d9e}
+.le-hours  {background:#e8f8f5;color:#0a5545} .le-payment{background:#fdeef2;color:#8a1240}
+.le-loyalty{background:#fff8e1;color:#7a5c00} .le-escalate{background:#fdf0ee;color:#a02010}
+.lms { font-size: 0.62rem; opacity: 0.65; }
+.lempty { font-size: 0.73rem; color: var(--mist); text-align: center; padding: 13px 0; font-style: italic; }
+.star-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+.star { font-size: 1.5rem; cursor: pointer; opacity: 0.22; transition: all 0.12s; border: none; background: none; color: #f0a030; }
+.star:hover, .star.on { opacity: 1; transform: scale(1.15); }
+.fbinput { width: 100%; padding: 8px 11px; border: 1.5px solid var(--parchment); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.77rem; resize: none; outline: none; background: var(--white); color: var(--charcoal); margin-bottom: 8px; transition: border-color 0.2s; }
+.fbinput:focus { border-color: var(--mint); }
+.fbsubmit { width: 100%; padding: 9px; border-radius: 8px; background: var(--leaf); color: #fff; border: none; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.79rem; cursor: pointer; transition: background 0.15s; }
+.fbsubmit:hover { background: var(--forest); }
+.rnote { background: var(--white); border: 1px solid var(--parchment); border-left: 3px solid var(--mint); border-radius: 8px; padding: 12px; font-size: 0.73rem; color: var(--bark); line-height: 1.75; }
+.rnote b { display: block; color: var(--forest); margin-bottom: 5px; font-size: 0.75rem; }
+
+/* ── OVERLAY ── */
+.overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(10,30,20,0.82); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--white); border-radius: 22px; padding: 36px 40px; max-width: 425px; width: 92%; box-shadow: 0 8px 40px rgba(26,58,42,0.18); animation: mIn 0.35s cubic-bezier(0.34,1.4,0.64,1); }
+@keyframes mIn{from{opacity:0;transform:scale(0.88) translateY(20px)}to{opacity:1;transform:none}}
+.mlogo { display: flex; align-items: center; gap: 11px; margin-bottom: 5px; }
+.mlogo-mark { width: 39px; height: 39px; background: linear-gradient(135deg, var(--leaf), var(--mint)); border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 21px; }
+.mlogo-name { font-family: 'Playfair Display', serif; font-size: 1.18rem; color: var(--forest); font-weight: 700; }
+.msub { font-size: 0.66rem; color: var(--mist); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 17px; padding-left: 50px; margin-top: -3px; }
+.modal h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--forest); margin-bottom: 6px; }
+.modal p { font-size: 0.81rem; color: var(--mist); margin-bottom: 20px; line-height: 1.6; }
+.mfield { margin-bottom: 13px; }
+.mfield label { display: block; font-size: 0.74rem; font-weight: 600; color: var(--bark); margin-bottom: 5px; letter-spacing: 0.02em; }
+.mfield input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--parchment); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.84rem; outline: none; background: var(--cream); color: var(--charcoal); transition: border-color 0.2s; }
+.mfield input:focus { border-color: var(--mint); background: var(--white); }
+.mbtn { width: 100%; padding: 12px; border-radius: 8px; background: linear-gradient(135deg, var(--leaf), var(--mint)); color: #fff; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.94rem; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(45,106,79,0.3); }
+.mbtn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(45,106,79,0.4); }
+.mnote { font-size: 0.67rem; color: var(--mist); text-align: center; margin-top: 10px; line-height: 1.5; }
+.merr { background: #fdf0ee; border: 1px solid #f0c0b8; color: #a02010; padding: 9px 13px; border-radius: 8px; font-size: 0.77rem; margin-bottom: 13px; display: none; }
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mlogo">
+      <div class="mlogo-mark">🌿</div>
+      <div class="mlogo-name">GreenLeaf</div>
+    </div>
+    <div class="msub">Retail Co. · Research Prototype · ETH2526-3698</div>
+    <h2>Start Your Session</h2>
+    <p>Enter the backend URL to connect. All interaction data is anonymised and used for research purposes only.</p>
+    <div class="merr" id="merr"></div>
+    <div class="mfield">
+      <label>Backend API URL</label>
+      <input type="text" id="apiUrl" value="http://localhost:4000/api" />
+    </div>
+    <button class="mbtn" onclick="startSession()">🌿 Connect &amp; Start →</button>
+    <p class="mnote">🔒 No personal data collected · IP anonymised · Research use only</p>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">🌿</div>
+    <div>
+      <div class="logo-text">GreenLeaf Retail Co.</div>
+      <div class="logo-sub">AI Customer Support · Lea</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="pill pill-conn off" id="cpill">
+      <div class="cdot" id="cdot"></div>
+      <span id="clbl">Connecting…</span>
+    </div>
+    <div class="pill pill-model">claude-sonnet-4</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT -->
+  <aside class="sl">
+    <div>
+      <div class="slabel">Common Questions</div>
+      <div class="faq-list">
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">🕐</span>What are your store hours?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">📍</span>Where are you located?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">🔄</span>What is the return policy?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">🚚</span>How long does delivery take?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">💳</span>What payment methods do you accept?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">📦</span>I want to track my order</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">⭐</span>Tell me about GreenLeaf Rewards</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">🛍</span>What products do you sell?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">🏷</span>Any current promotions?</div>
+        <div class="fchip" onclick="sendQ(this)"><span class="fchip-i">👤</span>I want to speak to a human agent</div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Store Info</div>
+      <div class="icard">
+        <div class="irow"><div class="irow-icon">📍</div><div><span class="irow-lbl">Location</span><span class="irow-val">14 Deansgate, Manchester, M3 4LX</span></div></div>
+        <div class="irow"><div class="irow-icon">🕐</div><div><span class="irow-lbl">Hours</span><span class="irow-val">Mon–Sat · 9 AM – 6 PM</span></div></div>
+        <div class="irow"><div class="irow-icon">📞</div><div><span class="irow-lbl">Phone</span><span class="irow-val">0161 123 4567</span></div></div>
+        <div class="irow"><div class="irow-icon">✉️</div><div><span class="irow-lbl">Email</span><span class="irow-val">support@greenleaf.co.uk</span></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Session</div>
+      <div class="sbar">
+        <div class="srow"><span>Session ID</span><span id="sId">—</span></div>
+        <div class="srow"><span>Started</span><span id="sTime">—</span></div>
+        <div class="srow"><span>Turns</span><span id="sTurns">0</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">System Stack</div>
+      <div class="astack">
+        <div class="arow"><div class="aicon">🌐</div><div><div class="aname">Frontend</div><div class="atech">HTML · CSS · Vanilla JS</div></div></div>
+        <div class="arow"><div class="aicon">🚀</div><div><div class="aname">Backend</div><div class="atech">Node.js · Express</div></div></div>
+        <div class="arow"><div class="aicon">🧠</div><div><div class="aname">LLM</div><div class="atech">claude-sonnet-4</div></div></div>
+        <div class="arow"><div class="aicon">💾</div><div><div class="aname">Database</div><div class="atech">SQLite · better-sqlite3</div></div></div>
+        <div class="arow"><div class="aicon">🔒</div><div><div class="aname">Security</div><div class="atech">Helmet · CORS · Rate Limit</div></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHAT -->
+  <main class="chat">
+    <div class="chat-top">
+      <div class="bot-id">
+        <div class="bot-av">🌿</div>
+        <div>
+          <div class="bot-name">Lea</div>
+          <div class="bot-role"><div class="odot"></div>AI Support Agent · GreenLeaf Retail Co.</div>
+        </div>
+      </div>
+      <div class="chat-btns">
+        <button class="cbtn" onclick="refreshStats()">📊 Refresh Stats</button>
+        <button class="cbtn" onclick="exportLog()">⬇ Export Log</button>
+        <button class="cbtn red" onclick="newSession()">✕ New Session</button>
+      </div>
+    </div>
+
+    <div class="msgs" id="msgs">
+      <div class="msg bot">
+        <div class="mav">🌿</div>
+        <div class="mbody">
+          <div class="bubble">👋 Hi there! I'm <strong>Lea</strong>, GreenLeaf's AI customer support assistant.<br><br>I can help with store hours, orders, returns, product questions and more. For complex issues I'll connect you with a human agent. How can I help?</div>
+          <div class="mmeta">Lea · Just now · AI Assistant</div>
+          <div class="mtags"><span class="tag t-resolved">✓ Greeting</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-bot">
+      <div class="qchips" id="qchips">
+        <div class="qchip" onclick="sendQ(this)">Store hours?</div>
+        <div class="qchip" onclick="sendQ(this)">Track my order</div>
+        <div class="qchip" onclick="sendQ(this)">Return policy?</div>
+        <div class="qchip" onclick="sendQ(this)">M-Pesa till number?</div>
+      </div>
+      <div class="input-wrap">
+        <textarea class="minput" id="minput" rows="1"
+          placeholder="Type your message to Lea…"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+        <button class="sbtn" id="sbtn" onclick="sendMsg()" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT — ANALYTICS -->
+  <aside class="sr">
+
+    <div>
+      <div class="phead">📊 Research Metrics</div>
+      <div class="kgrid">
+        <div class="kcard"><div class="kval" id="kTurns">0</div><div class="klbl">Total Turns</div></div>
+        <div class="kcard"><div class="kval" id="kRate">—</div><div class="klbl">Task Completion Rate</div></div>
+        <div class="kcard"><div class="kval teal" id="kAvg">—</div><div class="klbl">Avg Response Time</div></div>
+        <div class="kcard"><div class="kval amber" id="kEsc">0</div><div class="klbl">Escalations</div></div>
+        <div class="kcard"><div class="kval teal" id="kMin">—</div><div class="klbl">Fastest Response</div></div>
+        <div class="kcard"><div class="kval amber" id="kMax">—</div><div class="klbl">Slowest Response</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="phead">🎯 Intent Distribution</div>
+      <div class="ibars">
+        <div class="ibar-row"><div class="ibar-hdr"><span>FAQ / General</span><span class="ibar-pct" id="pFaq">0%</span></div><div class="btrack"><div class="bfill bf-faq" id="bFaq" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Order / Tracking</span><span class="ibar-pct" id="pOrder">0%</span></div><div class="btrack"><div class="bfill bf-order" id="bOrder" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Returns / Refunds</span><span class="ibar-pct" id="pReturns">0%</span></div><div class="btrack"><div class="bfill bf-returns" id="bReturns" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Product</span><span class="ibar-pct" id="pProduct">0%</span></div><div class="btrack"><div class="bfill bf-prod" id="bProduct" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Store Hours</span><span class="ibar-pct" id="pHours">0%</span></div><div class="btrack"><div class="bfill bf-hours" id="bHours" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Payment</span><span class="ibar-pct" id="pPayment">0%</span></div><div class="btrack"><div class="bfill bf-pay" id="bPayment" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Loyalty / Rewards</span><span class="ibar-pct" id="pLoyalty">0%</span></div><div class="btrack"><div class="bfill bf-loyal" id="bLoyalty" style="width:0%"></div></div></div>
+        <div class="ibar-row"><div class="ibar-hdr"><span>Escalation</span><span class="ibar-pct" id="pEscalate">0%</span></div><div class="btrack"><div class="bfill bf-esc" id="bEscalate" style="width:0%"></div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="phead">📋 Interaction Log</div>
+      <div class="lfeed" id="lfeed">
+        <div class="lempty" id="lempty">No interactions yet</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="phead">⭐ User Satisfaction</div>
+      <div class="star-row" id="starRow">
+        <button class="star" onclick="setStar(1)">★</button>
+        <button class="star" onclick="setStar(2)">★</button>
+        <button class="star" onclick="setStar(3)">★</button>
+        <button class="star" onclick="setStar(4)">★</button>
+        <button class="star" onclick="setStar(5)">★</button>
+      </div>
+      <textarea class="fbinput" id="fbComment" rows="2" placeholder="Optional: any comments about this session…"></textarea>
+      <button class="fbsubmit" onclick="submitFeedback()">Submit Feedback</button>
+    </div>
+
+    <div>
+      <div class="rnote">
+        <b>ETH2526-3698 — Key Evaluation Metrics</b>
+        ✦ Task Completion Rate<br>
+        ✦ Response Accuracy<br>
+        ✦ Response Time (ms)<br>
+        ✦ Escalation Rate<br>
+        ✦ User Satisfaction Score<br>
+        ✦ Human Intervention Reduction
+        <hr style="border:none;border-top:1px solid var(--parchment);margin:8px 0;">
+        <em style="font-size:0.67rem;color:var(--mist);">"How effective is an AI-powered chatbot in automating first-level customer support for SMEs?"</em>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+let API = 'http://localhost:4000/api';
+let SID = null;
+let rating = 0;
+let local = { total:0, esc:0, times:[], intents:{faq:0,order:0,returns:0,product:0,hours:0,payment:0,loyalty:0,escalate:0} };
+
+// ── Session ────────────────────────────────────────────────────────────────
+async function startSession() {
+  const url = document.getElementById('apiUrl').value.trim().replace(/\/$/,'');
+  if (!url) return showErr('Please enter the backend URL.');
+  API = url;
+  try {
+    await api('/health');
+    setConn(true);
+    const s = await api('/sessions','POST',{});
+    SID = s.session_id;
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('sbtn').disabled = false;
+    document.getElementById('sId').textContent   = SID.slice(0,8)+'…';
+    document.getElementById('sTime').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  } catch(e) { showErr('Cannot connect: '+e.message+'. Is the backend running?'); }
+}
+
+function showErr(m) {
+  const el = document.getElementById('merr');
+  el.textContent = '⚠ '+m; el.style.display = 'block';
+}
+
+function setConn(ok) {
+  const p = document.getElementById('cpill');
+  const d = document.getElementById('cdot');
+  const l = document.getElementById('clbl');
+  p.className = 'pill pill-conn'+(ok?'':' off');
+  d.className = 'cdot'+(ok?' live':'');
+  l.textContent = ok ? 'Connected' : 'Disconnected';
+}
+
+// ── Sending ────────────────────────────────────────────────────────────────
+async function sendMsg() {
+  if (!SID) return;
+  const inp = document.getElementById('minput');
+  const txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('sbtn').disabled = true;
+
+  addUser(txt);
+  const tid = showTyping();
+
+  try {
+    const d = await api('/chat','POST',{session_id:SID,message:txt});
+    removeTyping(tid);
+    addBot(d.reply, d.intent, d.escalated, d.response_ms);
+    if (d.quick_replies?.length) setChips(d.quick_replies);
+
+    local.total++;
+    local.times.push(d.response_ms);
+    if (d.escalated) local.esc++;
+    local.intents[d.intent] = (local.intents[d.intent]||0)+1;
+    document.getElementById('sTurns').textContent = local.total;
+    addLog(txt, d.intent, d.escalated, d.response_ms);
+    renderStats();
+  } catch(e) {
+    removeTyping(tid);
+    addBot('⚠️ '+e.message,'faq',false,0,true);
+  }
+
+  document.getElementById('sbtn').disabled = false;
+}
+
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();} }
+function sendQ(el) { document.getElementById('minput').value=el.textContent.trim(); sendMsg(); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+
+// ── DOM ────────────────────────────────────────────────────────────────────
+function addUser(txt) {
+  const m = document.getElementById('msgs');
+  const d = document.createElement('div'); d.className='msg user';
+  d.innerHTML=`<div class="mav">👤</div><div class="mbody"><div class="bubble">${esc(txt)}</div><div class="mmeta">You · ${now()}</div></div>`;
+  m.appendChild(d); scroll();
+}
+
+function addBot(txt, intent, escalated, ms, isErr=false) {
+  const m = document.getElementById('msgs');
+  const tClass = {faq:'t-faq',order:'t-order',returns:'t-returns',product:'t-product',hours:'t-hours',payment:'t-payment',loyalty:'t-loyalty',escalate:'t-escalate'}[intent]||'t-faq';
+  const tLabel = {faq:'🔹 FAQ',order:'📦 Order',returns:'🔄 Returns',product:'🛍 Product',hours:'🕐 Hours',payment:'💳 Payment',loyalty:'⭐ Loyalty',escalate:'⚠️ Complex'}[intent]||'🔹 FAQ';
+  const escCard = escalated ? `<div class="esc-card"><div class="esc-icon">👤</div><div class="esc-body"><b>Connecting to Human Support</b><span>A GreenLeaf team member will assist you. Ref: #GL-${Math.floor(Math.random()*90000+10000)}</span></div></div>` : '';
+  const d = document.createElement('div'); d.className='msg bot';
+  d.innerHTML=`
+    <div class="mav">🌿</div>
+    <div class="mbody">
+      <div class="bubble"${isErr?' style="background:#fdf0ee;border-color:#f0c0b8;color:#a02010"':''}>
+        ${txt.replace(/\n/g,'<br>')}
+      </div>
+      <div class="mmeta">Lea · ${now()} · AI Assistant</div>
+      <div class="mtags">
+        <span class="tag ${tClass}">${tLabel}</span>
+        ${escalated?'<span class="tag t-escalate">→ Escalated</span>':'<span class="tag t-resolved">✓ Resolved</span>'}
+        ${ms?`<span class="tag t-time">${ms}ms</span>`:''}
+      </div>
+      ${escCard}
+    </div>`;
+  m.appendChild(d); scroll();
+}
+
+function showTyping() {
+  const m=document.getElementById('msgs'); const id='tp_'+Date.now();
+  const d=document.createElement('div'); d.id=id; d.className='typing-wrap';
+  d.innerHTML=`<div class="mav" style="background:linear-gradient(135deg,var(--leaf),var(--mint));color:#fff;width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:4px;">🌿</div><div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  m.appendChild(d); scroll(); return id;
+}
+
+function removeTyping(id) { const el=document.getElementById(id); if(el)el.remove(); }
+
+function setChips(list) {
+  document.getElementById('qchips').innerHTML = list.map(t=>`<div class="qchip" onclick="sendQ(this)">${t}</div>`).join('');
+}
+
+function scroll() { const m=document.getElementById('msgs'); m.scrollTop=m.scrollHeight; }
+
+// ── Local stats render ─────────────────────────────────────────────────────
+function renderStats() {
+  const tot = local.total||1;
+  const res = local.total-local.esc;
+  document.getElementById('kTurns').textContent = local.total;
+  document.getElementById('kRate').textContent  = local.total ? Math.round(res/local.total*100)+'%' : '—';
+  document.getElementById('kEsc').textContent   = local.esc;
+  const avg = local.times.length ? Math.round(local.times.reduce((a,b)=>a+b,0)/local.times.length) : null;
+  document.getElementById('kAvg').textContent = avg ? avg+'ms' : '—';
+  document.getElementById('kMin').textContent = local.times.length ? Math.min(...local.times)+'ms' : '—';
+  document.getElementById('kMax').textContent = local.times.length ? Math.max(...local.times)+'ms' : '—';
+
+  const it = Object.values(local.intents).reduce((a,b)=>a+b,0)||1;
+  [['faq','Faq'],['order','Order'],['returns','Returns'],['product','Product'],
+   ['hours','Hours'],['payment','Payment'],['loyalty','Loyalty'],['escalate','Escalate']
+  ].forEach(([k,v])=>{
+    const p=Math.round((local.intents[k]||0)/it*100);
+    document.getElementById('p'+v).textContent=p+'%';
+    document.getElementById('b'+v).style.width=p+'%';
+  });
+}
+
+// ── Backend stats sync ─────────────────────────────────────────────────────
+async function refreshStats() {
+  if (!SID) return;
+  try {
+    const d = await api('/analytics?session_id='+SID);
+    const m=d.metrics, i=d.intent_distribution;
+    document.getElementById('kTurns').textContent = m.total_turns;
+    document.getElementById('kRate').textContent  = m.completion_rate+'%';
+    document.getElementById('kEsc').textContent   = m.escalations;
+    document.getElementById('kAvg').textContent   = m.avg_response_ms+'ms';
+    document.getElementById('kMin').textContent   = (m.min_response_ms||'—')+(m.min_response_ms?'ms':'');
+    document.getElementById('kMax').textContent   = (m.max_response_ms||'—')+(m.max_response_ms?'ms':'');
+    const tot=i.total||1;
+    [['faq','Faq'],['order','Order'],['returns','Returns'],['product','Product'],
+     ['hours','Hours'],['payment','Payment'],['loyalty','Loyalty'],['escalate','Escalate']
+    ].forEach(([k,v])=>{
+      const p=Math.round((i[k]||0)/tot*100);
+      document.getElementById('p'+v).textContent=p+'%';
+      document.getElementById('b'+v).style.width=p+'%';
+    });
+  } catch(e){ alert('Stats error: '+e.message); }
+}
+
+// ── Log ────────────────────────────────────────────────────────────────────
+function addLog(txt, intent, escalated, ms) {
+  const feed=document.getElementById('lfeed');
+  const empty=document.getElementById('lempty');
+  if(empty) empty.remove();
+  const cls=escalated?'escalate':intent;
+  const lbl={faq:'🔹 FAQ',order:'📦 Order',returns:'🔄 Return',product:'🛍 Product',hours:'🕐 Hours',payment:'💳 Pay',loyalty:'⭐ Loyalty',escalate:'⚠️ Escalated'}[escalated?'escalate':intent]||'🔹';
+  const short=txt.length>24?txt.slice(0,24)+'…':txt;
+  const el=document.createElement('div'); el.className=`lentry le-${cls}`;
+  el.innerHTML=`<span>${lbl}: ${short}</span><span class="lms">${ms}ms</span>`;
+  feed.insertBefore(el,feed.firstChild);
+  if(feed.children.length>9) feed.removeChild(feed.lastChild);
+}
+
+// ── Feedback ───────────────────────────────────────────────────────────────
+function setStar(n) {
+  rating=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<n));
+}
+
+async function submitFeedback() {
+  if(!SID){alert('No active session.');return;}
+  if(!rating){alert('Please select a star rating first.');return;}
+  const comment=document.getElementById('fbComment').value.trim();
+  try {
+    await api('/feedback','POST',{session_id:SID,rating,comment});
+    alert('✅ Thank you for your feedback!');
+    document.getElementById('fbComment').value='';
+    rating=0;
+    document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
+  } catch(e){alert('Error: '+e.message);}
+}
+
+// ── Export ─────────────────────────────────────────────────────────────────
+async function exportLog() {
+  if(!SID)return;
+  try {
+    const d=await api('/sessions/'+SID);
+    const head=[
+      'GreenLeaf Retail Co. — Lea Chatbot Research Log',
+      'Session  : '+SID,
+      'Exported : '+new Date().toISOString(),
+      'Research : ETH2526-3698',
+      '='.repeat(60),''
+    ].join('\n');
+    const body=d.messages.map(m=>
+      `[${m.created_at}] [${m.role.toUpperCase().padEnd(9)}] ${m.content}`+
+      (m.intent?`\n  intent    : ${m.intent}`:'')+
+      (m.escalated?`\n  escalated : yes`:'')+
+      (m.response_ms?`\n  resp_ms   : ${m.response_ms}ms`:'')+'\n'
+    ).join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([head+body],{type:'text/plain'}));
+    a.download=`greenleaf_${SID.slice(0,8)}.txt`;
+    a.click();
+  }catch(e){alert('Export failed: '+e.message);}
+}
+
+// ── New session ────────────────────────────────────────────────────────────
+async function newSession() {
+  if(!confirm('Start a new session? Current conversation will be saved to the database.'))return;
+  if(SID){try{await api('/sessions/'+SID+'/end','POST',{});}catch(_){}}
+  SID=null;
+  local={total:0,esc:0,times:[],intents:{faq:0,order:0,returns:0,product:0,hours:0,payment:0,loyalty:0,escalate:0}};
+  document.getElementById('msgs').innerHTML=`
+    <div class="msg bot"><div class="mav">🌿</div><div class="mbody">
+    <div class="bubble">👋 Hi! I'm <strong>Lea</strong>. How can I help?</div>
+    <div class="mmeta">Lea · Just now</div></div></div>`;
+  document.getElementById('lfeed').innerHTML='<div class="lempty" id="lempty">No interactions yet</div>';
+  document.getElementById('sbtn').disabled=true;
+  renderStats();
+  document.getElementById('overlay').style.display='flex';
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+async function api(path, method='GET', body=null) {
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body!==null) opts.body=JSON.stringify(body);
+  const res=await fetch(API+path,opts);
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error||'HTTP '+res.status);
+  return data;
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+</script>
+</body>
+</html>
