@@ -33,16 +33,28 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').
 
 app.use(cors({
   origin: (origin, cb) => {
+    // Allow requests with no origin (Postman, curl)
     if (!origin) return cb(null, true);
+    // Allow anything in the allowed origins list
     if (allowedOrigins.includes(origin)) return cb(null, true);
-    if (
-      process.env.NODE_ENV === 'development' &&
-      /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
-    ) return cb(null, true);
+    // Allow all localhost ports in development
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return cb(null, true);
+    }
+    // Allow GitHub Pages domain always
+    if (origin.startsWith('https://ashleycodinggeek.github.io')) {
+      return cb(null, true);
+    }
     cb(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST'],
+  origin: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: false,
 }));
+
+// Handle OPTIONS preflight requests explicitly
+app.options('*', cors());
 
 app.use('/api/', rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
