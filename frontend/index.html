@@ -654,27 +654,136 @@ async function submitFeedback() {
 
 // ── Export ─────────────────────────────────────────────────────────────────
 async function exportLog() {
-  if(!SID)return;
+  if (!SID) return;
   try {
-    const d=await api('/sessions/'+SID);
-    const head=[
-      'GreenLeaf Retail Co. — Lea Chatbot Research Log',
-      'Session  : '+SID,
-      'Exported : '+new Date().toISOString(),
-      'Research : ETH2526-3698',
-      '='.repeat(60),''
+    // Fetch both session messages and analytics in parallel
+    const [sessionData, analyticsData] = await Promise.all([
+      api('/sessions/' + SID),
+      api('/analytics?session_id=' + SID)
+    ]);
+
+    const m  = analyticsData.metrics;
+    const id = analyticsData.intent_distribution;
+
+    // ── Header ────────────────────────────────────────────────
+    const header = [
+      '╔══════════════════════════════════════════════════════════════╗',
+      '║       GREENLEAF RETAIL CO. — AI CHATBOT RESEARCH LOG        ║',
+      '╚══════════════════════════════════════════════════════════════╝',
+      '',
+      'RESEARCH DETAILS',
+      '─'.repeat(60),
+      'Course Code  : ETH2526-3698',
+      'Module       : Ethics Review',
+      'Research Q   : How effective is an AI-powered chatbot in',
+      '               automating first-level customer support for SMEs?',
+      'Company      : GreenLeaf Retail Co. (Hypothetical)',
+      'Bot Name     : Lea',
+      'Model        : Gemini 2.5 Flash (Free Tier)',
+      '',
+      'SESSION INFO',
+      '─'.repeat(60),
+      'Session ID   : ' + SID,
+      'Scenario     : SME Retail Customer Support',
+      'Started      : ' + (sessionData.session.created_at || 'N/A'),
+      'Ended        : ' + (sessionData.session.ended_at   || 'Still active'),
+      'Exported     : ' + new Date().toISOString(),
+      '',
     ].join('\n');
-    const body=d.messages.map(m=>
-      `[${m.created_at}] [${m.role.toUpperCase().padEnd(9)}] ${m.content}`+
-      (m.intent?`\n  intent    : ${m.intent}`:'')+
-      (m.escalated?`\n  escalated : yes`:'')+
-      (m.response_ms?`\n  resp_ms   : ${m.response_ms}ms`:'')+'\n'
-    ).join('\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([head+body],{type:'text/plain'}));
-    a.download=`greenleaf_${SID.slice(0,8)}.txt`;
+
+    // ── Research Metrics ──────────────────────────────────────
+    const totalTurns    = m.total_turns     || 0;
+    const escalations   = m.escalations     || 0;
+    const resolved      = totalTurns > 0 ? totalTurns - escalations : 0;
+    const escRate       = totalTurns > 0 ? ((escalations / totalTurns) * 100).toFixed(1) : '0.0';
+    const humanReduct   = totalTurns > 0 ? (100 - parseFloat(escRate)).toFixed(1) : '0.0';
+
+    const metrics = [
+      'RESEARCH EVALUATION METRICS',
+      '─'.repeat(60),
+      '1. Task Completion Rate     : ' + (m.completion_rate || 0) + '%',
+      '   (Turns resolved without escalation: ' + resolved + ' of ' + totalTurns + ')',
+      '',
+      '2. Response Time',
+      '   Average                  : ' + (m.avg_response_ms || 0) + ' ms',
+      '   Fastest                  : ' + (m.min_response_ms || 'N/A') + (m.min_response_ms ? ' ms' : ''),
+      '   Slowest                  : ' + (m.max_response_ms || 'N/A') + (m.max_response_ms ? ' ms' : ''),
+      '',
+      '3. Escalation Rate          : ' + escRate + '%',
+      '   (Escalated to human: ' + escalations + ' of ' + totalTurns + ' turns)',
+      '',
+      '4. Human Intervention Reduction : ' + humanReduct + '%',
+      '   (Turns handled by AI without human involvement)',
+      '',
+      '5. Total Conversation Turns : ' + totalTurns,
+      '',
+      'NOTE: Response Accuracy and User Satisfaction are collected',
+      'via the star rating widget and post-session survey.',
+      '',
+    ].join('\n');
+
+    // ── Intent Distribution ───────────────────────────────────
+    const total = id.total || 1;
+    const intentSection = [
+      'INTENT DISTRIBUTION',
+      '─'.repeat(60),
+      'FAQ / General      : ' + (id.faq      || 0) + ' (' + Math.round((id.faq      || 0) / total * 100) + '%)',
+      'Order / Tracking   : ' + (id.order    || 0) + ' (' + Math.round((id.order    || 0) / total * 100) + '%)',
+      'Returns / Refunds  : ' + (id.returns  || 0) + ' (' + Math.round((id.returns  || 0) / total * 100) + '%)',
+      'Product Queries    : ' + (id.product  || 0) + ' (' + Math.round((id.product  || 0) / total * 100) + '%)',
+      'Store Hours        : ' + (id.hours    || 0) + ' (' + Math.round((id.hours    || 0) / total * 100) + '%)',
+      'Payment            : ' + (id.payment  || 0) + ' (' + Math.round((id.payment  || 0) / total * 100) + '%)',
+      'Loyalty / Rewards  : ' + (id.loyalty  || 0) + ' (' + Math.round((id.loyalty  || 0) / total * 100) + '%)',
+      'Escalation         : ' + (id.escalate || 0) + ' (' + Math.round((id.escalate || 0) / total * 100) + '%)',
+      'Total User Turns   : ' + total,
+      '',
+    ].join('\n');
+
+    // ── Conversation Log ──────────────────────────────────────
+    const convHeader = [
+      'FULL CONVERSATION LOG',
+      '─'.repeat(60),
+      ''
+    ].join('\n');
+
+    const conversation = sessionData.messages.map((msg, i) => {
+      const role      = msg.role === 'user' ? 'CUSTOMER ' : 'LEA (AI) ';
+      const timestamp = msg.created_at || '';
+      const intent    = msg.intent     ? '  Intent    : ' + msg.intent    : '';
+      const escalated = msg.escalated  ? '  Escalated : YES — referred to human agent' : '';
+      const respTime  = msg.response_ms? '  Resp Time : ' + msg.response_ms + 'ms' : '';
+
+      return [
+        '[Turn ' + (Math.floor(i / 2) + 1) + '] [' + role + '] [' + timestamp + ']',
+        msg.content,
+        intent,
+        escalated,
+        respTime,
+        ''
+      ].filter(Boolean).join('\n');
+    }).join('\n');
+
+    // ── Footer ────────────────────────────────────────────────
+    const footer = [
+      '',
+      '─'.repeat(60),
+      'END OF RESEARCH LOG',
+      'Data anonymised — no personal information recorded.',
+      'Generated by GreenLeaf AI Chatbot Research Prototype.',
+      '─'.repeat(60),
+    ].join('\n');
+
+    // ── Combine and download ──────────────────────────────────
+    const fullLog = header + metrics + intentSection + convHeader + conversation + footer;
+
+    const a      = document.createElement('a');
+    a.href       = URL.createObjectURL(new Blob([fullLog], { type: 'text/plain' }));
+    a.download   = `greenleaf_research_log_${SID.slice(0, 8)}_${new Date().toISOString().slice(0,10)}.txt`;
     a.click();
-  }catch(e){alert('Export failed: '+e.message);}
+
+  } catch(e) {
+    alert('Export failed: ' + e.message);
+  }
 }
 
 // ── New session ────────────────────────────────────────────────────────────
