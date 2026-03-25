@@ -342,7 +342,6 @@ header {
         </div>
       </div>
       <div class="chat-btns">
-        <button class="cbtn" onclick="refreshStats()">📊 Refresh Stats</button>
         <button class="cbtn" onclick="exportLog()">⬇ Export Log</button>
         <button class="cbtn red" onclick="newSession()">✕ New Session</button>
       </div>
@@ -596,28 +595,6 @@ function renderStats() {
   });
 }
 
-// ── Backend stats sync ─────────────────────────────────────────────────────
-async function refreshStats() {
-  if (!SID) return;
-  try {
-    const d = await api('/analytics?session_id='+SID);
-    const m=d.metrics, i=d.intent_distribution;
-    document.getElementById('kTurns').textContent = m.total_turns;
-    document.getElementById('kRate').textContent  = m.completion_rate+'%';
-    document.getElementById('kEsc').textContent   = m.escalations;
-    document.getElementById('kAvg').textContent   = m.avg_response_ms+'ms';
-    document.getElementById('kMin').textContent   = (m.min_response_ms||'—')+(m.min_response_ms?'ms':'');
-    document.getElementById('kMax').textContent   = (m.max_response_ms||'—')+(m.max_response_ms?'ms':'');
-    const tot=i.total||1;
-    [['faq','Faq'],['order','Order'],['returns','Returns'],['product','Product'],
-     ['hours','Hours'],['payment','Payment'],['loyalty','Loyalty'],['escalate','Escalate']
-    ].forEach(([k,v])=>{
-      const p=Math.round((i[k]||0)/tot*100);
-      document.getElementById('p'+v).textContent=p+'%';
-      document.getElementById('b'+v).style.width=p+'%';
-    });
-  } catch(e){ alert('Stats error: '+e.message); }
-}
 
 // ── Log ────────────────────────────────────────────────────────────────────
 function addLog(txt, intent, escalated, ms) {
