@@ -100,13 +100,6 @@ header {
 .sbar { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 11px; }
 .srow { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.71rem; color: rgba(255,255,255,0.3); }
 .srow span:last-child { color: #b8d4c2; }
-.astack { display: flex; flex-direction: column; gap: 0; }
-.arow { display: flex; align-items: center; gap: 9px; padding: 6px 9px; border-radius: 6px; font-size: 0.73rem; position: relative; }
-.arow::before { content: ''; position: absolute; left: 22px; top: -5px; width: 1px; height: 5px; background: rgba(82,183,136,0.2); }
-.arow:first-child::before { display: none; }
-.aicon { width: 25px; height: 25px; border-radius: 6px; background: rgba(82,183,136,0.1); border: 1px solid rgba(82,183,136,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; }
-.aname { font-weight: 500; color: #d4e8dc; font-size: 0.74rem; }
-.atech { font-size: 0.63rem; color: rgba(255,255,255,0.28); }
 
 /* ── CHAT ── */
 .chat { display: flex; flex-direction: column; background: var(--white); overflow: hidden; }
@@ -273,13 +266,10 @@ header {
     </div>
     <div class="msub">Retail Co. · Research Prototype · ETH2526-3698</div>
     <h2>Start Your Session</h2>
-    <p>Enter the backend URL to connect. All interaction data is anonymised and used for research purposes only.</p>
+    <p>Welcome to the GreenLeaf AI support prototype. Click below to begin your session.All interaction data is anonymised and used for research purposes only.</p>
     <div class="merr" id="merr"></div>
-    <div class="mfield">
-      <label>Backend API URL</label>
-      <input type="text" id="apiUrl" value="http://localhost:4000/api" />
-    </div>
-    <button class="mbtn" onclick="startSession()">🌿 Connect &amp; Start →</button>
+    <input type="hidden" id="apiUrl" value="" />
+    <button class="mbtn" onclick="startSession()">🌿 Start Session →</button>
     <p class="mnote">🔒 No personal data collected · IP anonymised · Research use only</p>
   </div>
 </div>
@@ -298,7 +288,7 @@ header {
       <div class="cdot" id="cdot"></div>
       <span id="clbl">Connecting…</span>
     </div>
-    <div class="pill pill-model">claude-sonnet-4</div>
+    <div class="pill pill-model">gemini-2.5-flash</div>
   </div>
 </header>
 
@@ -338,16 +328,7 @@ header {
         <div class="srow"><span>Turns</span><span id="sTurns">0</span></div>
       </div>
     </div>
-    <div>
-      <div class="slabel">System Stack</div>
-      <div class="astack">
-        <div class="arow"><div class="aicon">🌐</div><div><div class="aname">Frontend</div><div class="atech">HTML · CSS · Vanilla JS</div></div></div>
-        <div class="arow"><div class="aicon">🚀</div><div><div class="aname">Backend</div><div class="atech">Node.js · Express</div></div></div>
-        <div class="arow"><div class="aicon">🧠</div><div><div class="aname">LLM</div><div class="atech">claude-sonnet-4</div></div></div>
-        <div class="arow"><div class="aicon">💾</div><div><div class="aname">Database</div><div class="atech">SQLite · better-sqlite3</div></div></div>
-        <div class="arow"><div class="aicon">🔒</div><div><div class="aname">Security</div><div class="atech">Helmet · CORS · Rate Limit</div></div></div>
-      </div>
-    </div>
+  
   </aside>
 
   <!-- CHAT -->
@@ -474,9 +455,14 @@ let local = { total:0, esc:0, times:[], intents:{faq:0,order:0,returns:0,product
 
 // ── Session ────────────────────────────────────────────────────────────────
 async function startSession() {
-  const url = document.getElementById('apiUrl').value.trim().replace(/\/$/,'');
-  if (!url) return showErr('Please enter the backend URL.');
-  API = url;
+  // Auto-detect environment — use localhost when developing, Render when live
+  const isLocal = window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1';
+
+  API = isLocal
+    ? 'http://localhost:4000/api'
+    : 'https://greenleaf-chatbot-backend.onrender.com/api';
+
   try {
     await api('/health');
     setConn(true);
@@ -486,7 +472,9 @@ async function startSession() {
     document.getElementById('sbtn').disabled = false;
     document.getElementById('sId').textContent   = SID.slice(0,8)+'…';
     document.getElementById('sTime').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  } catch(e) { showErr('Cannot connect: '+e.message+'. Is the backend running?'); }
+  } catch(e) {
+    showErr('Cannot connect: '+e.message+'. Is the backend running?');
+  }
 }
 
 function showErr(m) {
@@ -666,27 +654,136 @@ async function submitFeedback() {
 
 // ── Export ─────────────────────────────────────────────────────────────────
 async function exportLog() {
-  if(!SID)return;
+  if (!SID) return;
   try {
-    const d=await api('/sessions/'+SID);
-    const head=[
-      'GreenLeaf Retail Co. — Lea Chatbot Research Log',
-      'Session  : '+SID,
-      'Exported : '+new Date().toISOString(),
-      'Research : ETH2526-3698',
-      '='.repeat(60),''
+    // Fetch both session messages and analytics in parallel
+    const [sessionData, analyticsData] = await Promise.all([
+      api('/sessions/' + SID),
+      api('/analytics?session_id=' + SID)
+    ]);
+
+    const m  = analyticsData.metrics;
+    const id = analyticsData.intent_distribution;
+
+    // ── Header ────────────────────────────────────────────────
+    const header = [
+      '╔══════════════════════════════════════════════════════════════╗',
+      '║       GREENLEAF RETAIL CO. — AI CHATBOT RESEARCH LOG        ║',
+      '╚══════════════════════════════════════════════════════════════╝',
+      '',
+      'RESEARCH DETAILS',
+      '─'.repeat(60),
+      'Course Code  : ETH2526-3698',
+      'Module       : Ethics Review',
+      'Research Q   : How effective is an AI-powered chatbot in',
+      '               automating first-level customer support for SMEs?',
+      'Company      : GreenLeaf Retail Co. (Hypothetical)',
+      'Bot Name     : Lea',
+      'Model        : Gemini 2.5 Flash (Free Tier)',
+      '',
+      'SESSION INFO',
+      '─'.repeat(60),
+      'Session ID   : ' + SID,
+      'Scenario     : SME Retail Customer Support',
+      'Started      : ' + (sessionData.session.created_at || 'N/A'),
+      'Ended        : ' + (sessionData.session.ended_at   || 'Still active'),
+      'Exported     : ' + new Date().toISOString(),
+      '',
     ].join('\n');
-    const body=d.messages.map(m=>
-      `[${m.created_at}] [${m.role.toUpperCase().padEnd(9)}] ${m.content}`+
-      (m.intent?`\n  intent    : ${m.intent}`:'')+
-      (m.escalated?`\n  escalated : yes`:'')+
-      (m.response_ms?`\n  resp_ms   : ${m.response_ms}ms`:'')+'\n'
-    ).join('\n');
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([head+body],{type:'text/plain'}));
-    a.download=`greenleaf_${SID.slice(0,8)}.txt`;
+
+    // ── Research Metrics ──────────────────────────────────────
+    const totalTurns    = m.total_turns     || 0;
+    const escalations   = m.escalations     || 0;
+    const resolved      = totalTurns > 0 ? totalTurns - escalations : 0;
+    const escRate       = totalTurns > 0 ? ((escalations / totalTurns) * 100).toFixed(1) : '0.0';
+    const humanReduct   = totalTurns > 0 ? (100 - parseFloat(escRate)).toFixed(1) : '0.0';
+
+    const metrics = [
+      'RESEARCH EVALUATION METRICS',
+      '─'.repeat(60),
+      '1. Task Completion Rate     : ' + (m.completion_rate || 0) + '%',
+      '   (Turns resolved without escalation: ' + resolved + ' of ' + totalTurns + ')',
+      '',
+      '2. Response Time',
+      '   Average                  : ' + (m.avg_response_ms || 0) + ' ms',
+      '   Fastest                  : ' + (m.min_response_ms || 'N/A') + (m.min_response_ms ? ' ms' : ''),
+      '   Slowest                  : ' + (m.max_response_ms || 'N/A') + (m.max_response_ms ? ' ms' : ''),
+      '',
+      '3. Escalation Rate          : ' + escRate + '%',
+      '   (Escalated to human: ' + escalations + ' of ' + totalTurns + ' turns)',
+      '',
+      '4. Human Intervention Reduction : ' + humanReduct + '%',
+      '   (Turns handled by AI without human involvement)',
+      '',
+      '5. Total Conversation Turns : ' + totalTurns,
+      '',
+      'NOTE: Response Accuracy and User Satisfaction are collected',
+      'via the star rating widget and post-session survey.',
+      '',
+    ].join('\n');
+
+    // ── Intent Distribution ───────────────────────────────────
+    const total = id.total || 1;
+    const intentSection = [
+      'INTENT DISTRIBUTION',
+      '─'.repeat(60),
+      'FAQ / General      : ' + (id.faq      || 0) + ' (' + Math.round((id.faq      || 0) / total * 100) + '%)',
+      'Order / Tracking   : ' + (id.order    || 0) + ' (' + Math.round((id.order    || 0) / total * 100) + '%)',
+      'Returns / Refunds  : ' + (id.returns  || 0) + ' (' + Math.round((id.returns  || 0) / total * 100) + '%)',
+      'Product Queries    : ' + (id.product  || 0) + ' (' + Math.round((id.product  || 0) / total * 100) + '%)',
+      'Store Hours        : ' + (id.hours    || 0) + ' (' + Math.round((id.hours    || 0) / total * 100) + '%)',
+      'Payment            : ' + (id.payment  || 0) + ' (' + Math.round((id.payment  || 0) / total * 100) + '%)',
+      'Loyalty / Rewards  : ' + (id.loyalty  || 0) + ' (' + Math.round((id.loyalty  || 0) / total * 100) + '%)',
+      'Escalation         : ' + (id.escalate || 0) + ' (' + Math.round((id.escalate || 0) / total * 100) + '%)',
+      'Total User Turns   : ' + total,
+      '',
+    ].join('\n');
+
+    // ── Conversation Log ──────────────────────────────────────
+    const convHeader = [
+      'FULL CONVERSATION LOG',
+      '─'.repeat(60),
+      ''
+    ].join('\n');
+
+    const conversation = sessionData.messages.map((msg, i) => {
+      const role      = msg.role === 'user' ? 'CUSTOMER ' : 'LEA (AI) ';
+      const timestamp = msg.created_at || '';
+      const intent    = msg.intent     ? '  Intent    : ' + msg.intent    : '';
+      const escalated = msg.escalated  ? '  Escalated : YES — referred to human agent' : '';
+      const respTime  = msg.response_ms? '  Resp Time : ' + msg.response_ms + 'ms' : '';
+
+      return [
+        '[Turn ' + (Math.floor(i / 2) + 1) + '] [' + role + '] [' + timestamp + ']',
+        msg.content,
+        intent,
+        escalated,
+        respTime,
+        ''
+      ].filter(Boolean).join('\n');
+    }).join('\n');
+
+    // ── Footer ────────────────────────────────────────────────
+    const footer = [
+      '',
+      '─'.repeat(60),
+      'END OF RESEARCH LOG',
+      'Data anonymised — no personal information recorded.',
+      'Generated by GreenLeaf AI Chatbot Research Prototype.',
+      '─'.repeat(60),
+    ].join('\n');
+
+    // ── Combine and download ──────────────────────────────────
+    const fullLog = header + metrics + intentSection + convHeader + conversation + footer;
+
+    const a      = document.createElement('a');
+    a.href       = URL.createObjectURL(new Blob([fullLog], { type: 'text/plain' }));
+    a.download   = `greenleaf_research_log_${SID.slice(0, 8)}_${new Date().toISOString().slice(0,10)}.txt`;
     a.click();
-  }catch(e){alert('Export failed: '+e.message);}
+
+  } catch(e) {
+    alert('Export failed: ' + e.message);
+  }
 }
 
 // ── New session ────────────────────────────────────────────────────────────
