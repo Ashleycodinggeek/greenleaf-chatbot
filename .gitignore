@@ -1,0 +1,8 @@
+# Secret keys — never upload these
+backend/.env
+
+# Dependencies — reinstalled on server
+backend/node_modules/
+
+# Database file — created fresh on server
+backend/data/

@@ -273,13 +273,10 @@ header {
     </div>
     <div class="msub">Retail Co. · Research Prototype · ETH2526-3698</div>
     <h2>Start Your Session</h2>
-    <p>Enter the backend URL to connect. All interaction data is anonymised and used for research purposes only.</p>
+    <p>Welcome to the GreenLeaf AI support prototype. Click below to begin your session.All interaction data is anonymised and used for research purposes only.</p>
     <div class="merr" id="merr"></div>
-    <div class="mfield">
-      <label>Backend API URL</label>
-      <input type="text" id="apiUrl" value="http://localhost:4000/api" />
-    </div>
-    <button class="mbtn" onclick="startSession()">🌿 Connect &amp; Start →</button>
+    <input type="hidden" id="apiUrl" value="" />
+    <button class="mbtn" onclick="startSession()">🌿 Start Session →</button>
     <p class="mnote">🔒 No personal data collected · IP anonymised · Research use only</p>
   </div>
 </div>
@@ -298,7 +295,7 @@ header {
       <div class="cdot" id="cdot"></div>
       <span id="clbl">Connecting…</span>
     </div>
-    <div class="pill pill-model">claude-sonnet-4</div>
+    <div class="pill pill-model">gemini-2.5-flash</div>
   </div>
 </header>
 
@@ -474,9 +471,14 @@ let local = { total:0, esc:0, times:[], intents:{faq:0,order:0,returns:0,product
 
 // ── Session ────────────────────────────────────────────────────────────────
 async function startSession() {
-  const url = document.getElementById('apiUrl').value.trim().replace(/\/$/,'');
-  if (!url) return showErr('Please enter the backend URL.');
-  API = url;
+  // Auto-detect environment — use localhost when developing, Render when live
+  const isLocal = window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1';
+
+  API = isLocal
+    ? 'http://localhost:4000/api'
+    : 'https://greenleaf-chatbot-backend.onrender.com/api';
+
   try {
     await api('/health');
     setConn(true);
@@ -486,7 +488,9 @@ async function startSession() {
     document.getElementById('sbtn').disabled = false;
     document.getElementById('sId').textContent   = SID.slice(0,8)+'…';
     document.getElementById('sTime').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  } catch(e) { showErr('Cannot connect: '+e.message+'. Is the backend running?'); }
+  } catch(e) {
+    showErr('Cannot connect: '+e.message+'. Is the backend running?');
+  }
 }
 
 function showErr(m) {
