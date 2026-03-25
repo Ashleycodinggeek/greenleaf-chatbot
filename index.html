@@ -455,7 +455,6 @@ let local = { total:0, esc:0, times:[], intents:{faq:0,order:0,returns:0,product
 
 // ── Session ────────────────────────────────────────────────────────────────
 async function startSession() {
-  // Auto-detect environment — use localhost when developing, Render when live
   const isLocal = window.location.hostname === 'localhost' ||
                   window.location.hostname === '127.0.0.1';
 
@@ -463,32 +462,51 @@ async function startSession() {
     ? 'http://localhost:4000/api'
     : 'https://greenleaf-chatbot-backend.onrender.com/api';
 
-  try {
-    await api('/health');
-    setConn(true);
-    const s = await api('/sessions','POST',{});
-    SID = s.session_id;
-    document.getElementById('overlay').style.display = 'none';
-    document.getElementById('sbtn').disabled = false;
-    document.getElementById('sId').textContent   = SID.slice(0,8)+'…';
-    document.getElementById('sTime').textContent = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  } catch(e) {
-    showErr('Cannot connect: '+e.message+'. Is the backend running?');
+  // Show a waking up message on the live site
+  if (!isLocal) {
+    document.getElementById('merr').style.display = 'block';
+    document.getElementById('merr').style.background = '#f0fdf4';
+    document.getElementById('merr').style.color = '#166534';
+    document.getElementById('merr').style.borderColor = '#bbf7d0';
+    document.getElementById('merr').textContent = '⏳ Waking up the server… this takes up to 60 seconds on first load. Please wait.';
   }
-}
 
-function showErr(m) {
-  const el = document.getElementById('merr');
-  el.textContent = '⚠ '+m; el.style.display = 'block';
-}
+  // Retry up to 6 times with 10 second gaps (60 seconds total)
+  let attempts = 0;
+  const maxAttempts = 6;
 
-function setConn(ok) {
-  const p = document.getElementById('cpill');
-  const d = document.getElementById('cdot');
-  const l = document.getElementById('clbl');
-  p.className = 'pill pill-conn'+(ok?'':' off');
-  d.className = 'cdot'+(ok?' live':'');
-  l.textContent = ok ? 'Connected' : 'Disconnected';
+  while (attempts < maxAttempts) {
+    try {
+      await api('/health');
+
+      // Connected — hide the message and start session
+      document.getElementById('merr').style.display = 'none';
+      setConn(true);
+
+      const s = await api('/sessions', 'POST', {});
+      SID = s.session_id;
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('sbtn').disabled = false;
+      document.getElementById('sId').textContent   = SID.slice(0, 8) + '…';
+      document.getElementById('sTime').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return;
+
+    } catch (e) {
+      attempts++;
+      if (attempts >= maxAttempts) {
+        // All retries failed
+        document.getElementById('merr').style.background = '';
+        document.getElementById('merr').style.color = '';
+        document.getElementById('merr').style.borderColor = '';
+        showErr('Cannot connect after 60 seconds. Please refresh the page and try again.');
+        return;
+      }
+      // Wait 10 seconds before retrying
+      const remaining = (maxAttempts - attempts) * 10;
+      document.getElementById('merr').textContent = `⏳ Server is waking up… retrying (${remaining}s remaining). Please wait.`;
+      await new Promise(resolve => setTimeout(resolve, 10000));
+    }
+  }
 }
 
 // ── Sending ────────────────────────────────────────────────────────────────
