@@ -1,8 +1,12 @@
-# Secret keys — never upload these
+# Secret keys
 backend/.env
 
-# Dependencies — reinstalled on server
-backend/node_modules/
+# ALL node_modules anywhere in the project
+node_modules/
+**/node_modules/
 
-# Database file — created fresh on server
+# Database
 backend/data/
+
+# Logs
+*.log
