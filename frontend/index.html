@@ -100,13 +100,6 @@ header {
 .sbar { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 11px; }
 .srow { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.71rem; color: rgba(255,255,255,0.3); }
 .srow span:last-child { color: #b8d4c2; }
-.astack { display: flex; flex-direction: column; gap: 0; }
-.arow { display: flex; align-items: center; gap: 9px; padding: 6px 9px; border-radius: 6px; font-size: 0.73rem; position: relative; }
-.arow::before { content: ''; position: absolute; left: 22px; top: -5px; width: 1px; height: 5px; background: rgba(82,183,136,0.2); }
-.arow:first-child::before { display: none; }
-.aicon { width: 25px; height: 25px; border-radius: 6px; background: rgba(82,183,136,0.1); border: 1px solid rgba(82,183,136,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; }
-.aname { font-weight: 500; color: #d4e8dc; font-size: 0.74rem; }
-.atech { font-size: 0.63rem; color: rgba(255,255,255,0.28); }
 
 /* ── CHAT ── */
 .chat { display: flex; flex-direction: column; background: var(--white); overflow: hidden; }
@@ -335,16 +328,7 @@ header {
         <div class="srow"><span>Turns</span><span id="sTurns">0</span></div>
       </div>
     </div>
-    <div>
-      <div class="slabel">System Stack</div>
-      <div class="astack">
-        <div class="arow"><div class="aicon">🌐</div><div><div class="aname">Frontend</div><div class="atech">HTML · CSS · Vanilla JS</div></div></div>
-        <div class="arow"><div class="aicon">🚀</div><div><div class="aname">Backend</div><div class="atech">Node.js · Express</div></div></div>
-        <div class="arow"><div class="aicon">🧠</div><div><div class="aname">LLM</div><div class="atech">claude-sonnet-4</div></div></div>
-        <div class="arow"><div class="aicon">💾</div><div><div class="aname">Database</div><div class="atech">SQLite · better-sqlite3</div></div></div>
-        <div class="arow"><div class="aicon">🔒</div><div><div class="aname">Security</div><div class="atech">Helmet · CORS · Rate Limit</div></div></div>
-      </div>
-    </div>
+  
   </aside>
 
   <!-- CHAT -->
