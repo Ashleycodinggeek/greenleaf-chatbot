@@ -8,7 +8,7 @@ const INTENT_PATTERNS = {
   returns:  /return|refund|exchange|bring back|unused/i,
   product:  /product|price|cost|stock|available|kitchenware|bedding|decor|what do you sell/i,
   hours:    /hour|open|close|when.*open|operating|weekend|sunday|holiday/i,
-  payment:  /pay|mpesa|visa|card|cash|till number|how.*pay/i,
+  payment:  /pay|venmo|visa|card|cash|paypal|how.*pay/i,
   loyalty:  /loyalty|reward|point|redeem|discount|offer|promo/i,
 };
 
@@ -41,7 +41,7 @@ function suggestQuickReplies(intent) {
     returns:  ['How do I return an item?', 'Return policy?', 'Request a refund'],
     product:  ['What products do you sell?', 'Is this item in stock?', 'Current promotions?'],
     hours:    ['Are you open on Sundays?', 'Public holiday hours?', 'What time do you close?'],
-    payment:  ['M-Pesa till number?', 'Do you accept cards?', 'Cash on delivery?'],
+    payment:  ['Do you accept Paypal', 'Do you accept cards?', 'Cash on delivery?'],
     loyalty:  ['How do I earn points?', 'How do I redeem points?', 'Check my points balance'],
     escalate: ['Speak to a human', 'Submit a complaint', 'Request a callback'],
   };
